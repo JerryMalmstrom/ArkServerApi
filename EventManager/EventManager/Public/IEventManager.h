@@ -83,6 +83,9 @@ namespace EventManager
 		virtual FString& GetServerName() = 0;
 
 		virtual bool IsEventRunning() = 0;
+
+		virtual DWORD NextEvent() = 0;
+
 		virtual bool OnlyNakeds() = 0;
 		virtual FString GetCurrentEventName() = 0;
 		virtual EventState GetEventState() = 0;

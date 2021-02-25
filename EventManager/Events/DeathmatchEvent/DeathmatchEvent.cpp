@@ -61,6 +61,9 @@ public:
 
 				Notifications = config["Deathmatch"]["TopNotifications"];
 				const float MovementSpeedAddon = config["Deathmatch"]["MovementSpeedAddon"];
+				const float HealthAddon = config["Deathmatch"]["HealthAddon"];
+				const float MeleeAddon = config["Deathmatch"]["MeleeAddon"];
+
 				const int ArkShopPointsEntryFee = config["Deathmatch"]["ArkShopPointsEntryFee"];
 
 				ArkShopPointsRewardMin = config["Deathmatch"]["ArkShopPointsRewardMin"];
@@ -72,7 +75,7 @@ public:
 				std::string Data;
 
 				InitDefaults(EventName, false, true, KillOnLogg, StructureProtection
-					, FVector(StructureProtectionPosition[0], StructureProtectionPosition[1], StructureProtectionPosition[2]), StructureProtectionDistacne, MovementSpeedAddon, ArkShopPointsEntryFee, PlayersNeededToStart);
+					, FVector(StructureProtectionPosition[0], StructureProtectionPosition[1], StructureProtectionPosition[2]), StructureProtectionDistacne, MovementSpeedAddon, HealthAddon, MeleeAddon, ArkShopPointsEntryFee, PlayersNeededToStart);
 
 				const auto& Spawns = config["Deathmatch"]["Spawns"];
 				for (const auto& Spawn : Spawns)
@@ -217,7 +220,7 @@ public:
 			{
 				const int Players = EventManager::Get().GetEventPlayersCount();
 				if (Notifications) EventManager::Get().SendNotificationToAllEventPlayers(FLinearColor(0, 1, 0), 1.5f, 1.f, nullptr, *Messages[9], *GetName(), Players);
-				if (Players <= 1) SetState(EventState::Rewarding);
+				//if (Players <= 1) SetState(EventState::Rewarding);
 			}
 			break;
 		case EventState::Rewarding:

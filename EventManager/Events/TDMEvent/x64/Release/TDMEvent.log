@@ -1,0 +1,2 @@
+﻿  TDMEvent.cpp
+C:\Users\Jerry\source\repos\ArkServerApi\EventManager\Events\TDMEvent\TDMEvent.h(3,10): fatal error C1083: Cannot open include file: 'API\ARK\Ark.h': No such file or directory

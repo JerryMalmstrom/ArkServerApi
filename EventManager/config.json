@@ -3,6 +3,7 @@
       "ServerName":"ServerNameHere",
       "JoinCommand":"/join",
       "LeaveCommand":"/leave",
+      "CheckCommand":"/check",
       "AdminStartEventConsoleCommand":"startevent",
 	  "EventStartAuto":true,
       "EventStartMinuteMin":45,

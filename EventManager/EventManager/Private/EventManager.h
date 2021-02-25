@@ -27,13 +27,14 @@ namespace EventManager
 	public:
 		static EventManager& Get();
 
+		DWORD NextEvent() { return NextEventTime; }
+
 		EventManager(const EventManager&) = delete;
 		EventManager(EventManager&&) = delete;
 		EventManager& operator=(const EventManager&) = delete;
 		EventManager& operator=(EventManager&&) = delete;
 
 		FString& GetServerName();
-
 		bool IsEventRunning() { return CurrentEvent != nullptr; }
 		bool OnlyNakeds() { return CurrentEvent->OnlyNakeds(); }
 		FString GetCurrentEventName();

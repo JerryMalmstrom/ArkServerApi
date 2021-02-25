@@ -186,6 +186,9 @@ namespace EventManager
 			TeamBased = false;
 		}
 		const float MovementSpeed = CurrentEvent->GetMovementSpeed();
+		const float Health = CurrentEvent->GetHealth();
+		const float Melee = CurrentEvent->GetMelee();
+
 		FVector Pos;
 		bool RemovePlayers = false;
 		UShooterCheatManager* cheatManager;
@@ -245,7 +248,7 @@ namespace EventManager
 					{
 						float* health = charStatus->CurrentStatusValuesField()();
 						player.EventPlayerStats.health = *health;
-						*health = 100.f;
+						*health = Health;
 					}
 
 					float* torpor = charStatus->CurrentStatusValuesField()() + 2;
@@ -262,8 +265,10 @@ namespace EventManager
 					{
 						float* melee = charStatus->CurrentStatusValuesField()() + 8;
 						player.EventPlayerStats.melee = *melee;
-						*melee = 100;
+						*melee = Melee;
 					}
+
+					if (LogToConsole) Log::GetLog()->info("Fair: {} {} ({})!", ApplyFairMeleeDamage, ApplyFairMovementSpeed, ApplyFairHp);
 				}
 
 			}
@@ -690,9 +695,9 @@ namespace EventManager
 		{
 			if (EventPlayer* EPlayer; (EPlayer = FindPlayer(Player->LinkedPlayerIDField())))
 			{
-				if (CurrentEvent->KillOnLoggout()) Player->ServerSuicide_Implementation();
+				if (CurrentEvent->KillOnLoggout()) EPlayer->ASPC->GetPlayerCharacter()->Suicide();
 				else if (EPlayer->ASPC && EPlayer->ASPC->GetPlayerCharacter()) TeleportHome(*EPlayer, true, true);
-				else Player->ServerSuicide_Implementation();
+				else EPlayer->ASPC->GetPlayerCharacter()->Suicide();
 				RemovePlayer(Player);
 			}
 		}

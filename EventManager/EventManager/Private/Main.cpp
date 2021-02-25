@@ -10,9 +10,10 @@ DECLARE_HOOK(AShooterCharacter_Die, bool, AShooterCharacter*, float, FDamageEven
 DECLARE_HOOK(AShooterGameMode_Logout, void, AShooterGameMode*, AController*);
 DECLARE_HOOK(AShooterPlayerController_ServerSendChatMessage_Implementation, void, AShooterPlayerController*, FString*, EChatSendMode::Type);
 
-FString EventJoinCommand, EventLeaveCommand, EventAdminStartEventConsoleCommand;
+FString EventJoinCommand, EventLeaveCommand, EventAdminStartEventConsoleCommand, EventCheckCommand;
 FString Messages[13];
 TArray<FString> AllowedCommands;
+
 
 void EventManagerUpdate()
 {
@@ -140,6 +141,14 @@ void LeaveEvent(AShooterPlayerController* player, FString* message, int mode)
 	}
 }
 
+void CheckEvent(AShooterPlayerController* player, FString* message, int mode)
+{
+	if (!player || !player->PlayerStateField() || !player->GetPlayerCharacter()) return;
+	DWORD TimeToNextEvent;
+	TimeToNextEvent = EventManager::Get().NextEvent();
+	ArkApi::GetApiUtils().SendServerMessage(player, FLinearColor(0, 1, 0), L"Next event @ {}", (TimeToNextEvent - timeGetTime()) / 60000 );
+}
+
 void StartEvent(APlayerController* player_controller, FString* message, bool LogToFile)
 {
 	AShooterPlayerController* player = static_cast<AShooterPlayerController*>(player_controller);
@@ -199,8 +208,9 @@ void InitConfig()
 	EventLeaveCommand = ArkApi::Tools::Utf8Decode(data).c_str();
 	data = config["EventManager"]["AdminStartEventConsoleCommand"];
 	EventAdminStartEventConsoleCommand = ArkApi::Tools::Utf8Decode(data).c_str();
-
-
+	data = config["EventManager"]["CheckCommand"];
+	EventCheckCommand = ArkApi::Tools::Utf8Decode(data).c_str();
+	
 	const bool EventStartAuto = config["EventManager"]["EventStartAuto"];
 	const int EventStartMinuteMin = config["EventManager"]["EventStartMinuteMin"], EventStartMinuteMax = config["EventManager"]["EventStartMinuteMax"];
 
@@ -268,6 +278,7 @@ void InitEventManager()
 	ArkApi::GetCommands().AddOnTimerCallback("EventManagerUpdate", &EventManagerUpdate);
 	ArkApi::GetCommands().AddChatCommand(EventJoinCommand, &JoinEvent);
 	ArkApi::GetCommands().AddChatCommand(EventLeaveCommand, &LeaveEvent);
+	ArkApi::GetCommands().AddChatCommand(EventCheckCommand, &CheckEvent);
 	ArkApi::GetCommands().AddChatCommand("/tpos", &Pos);
 	ArkApi::GetCommands().AddChatCommand("/emreload", &ReloadConfig);
 	ArkApi::GetCommands().AddConsoleCommand(EventAdminStartEventConsoleCommand, &StartEvent);
