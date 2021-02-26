@@ -146,7 +146,7 @@ void CheckEvent(AShooterPlayerController* player, FString* message, int mode)
 	if (!player || !player->PlayerStateField() || !player->GetPlayerCharacter()) return;
 	DWORD TimeToNextEvent;
 	TimeToNextEvent = EventManager::Get().NextEvent();
-	ArkApi::GetApiUtils().SendServerMessage(player, FLinearColor(0, 1, 0), L"Next event @ {}", (TimeToNextEvent - timeGetTime()) / 60000 );
+	ArkApi::GetApiUtils().SendChatMessage(player, EventManager::Get().GetServerName(), L"Next event in {} min", (TimeToNextEvent - timeGetTime()) / 60000 );
 }
 
 void StartEvent(APlayerController* player_controller, FString* message, bool LogToFile)

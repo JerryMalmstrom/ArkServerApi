@@ -61,7 +61,7 @@ public:
 
 				Notifications = config["TDM"]["TopNotifications"];
 				const float MovementSpeedAddon = config["TDM"]["MovementSpeedAddon"];
-				const int ArkShopPointsEntryFee = config["TDM"]["ArkShopPointsEntryFee"];
+				const float ArkShopPointsEntryFee = config["TDM"]["ArkShopPointsEntryFee"];
 
 				ArkShopPointsRewardMin = config["TDM"]["ArkShopPointsRewardMin"];
 				ArkShopPointsRewardMax = config["TDM"]["ArkShopPointsRewardMax"];
@@ -72,7 +72,7 @@ public:
 				std::string Data;
 
 				InitDefaults(EventName, false, true, KillOnLogg, StructureProtection
-					, FVector(StructureProtectionPosition[0], StructureProtectionPosition[1], StructureProtectionPosition[2]), StructureProtectionDistacne, MovementSpeedAddon, ArkShopPointsEntryFee, PlayersNeededToStart);
+					, FVector(StructureProtectionPosition[0], StructureProtectionPosition[1], StructureProtectionPosition[2]), StructureProtectionDistacne, MovementSpeedAddon, 100, 100, ArkShopPointsEntryFee, PlayersNeededToStart);
 
 				const auto& SpawnsA = config["TDM"]["TeamASpawns"];
 				for (const auto& Spawn : SpawnsA)
@@ -189,7 +189,7 @@ public:
 			}
 			break;
 		case EventState::TeleportingPlayers:
-			if (!EventManager::Get().TeleportEventPlayers(true, true, true, true, false, true, GetSpawns()))
+			if (!EventManager::Get().TeleportEventPlayers(true, true, true, true, true, false, true, GetSpawns()))
 			{
 				ArkApi::GetApiUtils().SendChatMessageToAll(ServerName, *Messages[4], *GetName(), PlayersNeededToStart);
 				SetState(EventState::Finished);

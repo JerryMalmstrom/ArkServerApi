@@ -60,9 +60,12 @@ public:
 				const int StructureProtectionDistacne = config["Deathmatch"]["StructureProtectionDistance"];
 
 				Notifications = config["Deathmatch"]["TopNotifications"];
-				const float MovementSpeedAddon = config["Deathmatch"]["MovementSpeedAddon"];
-				const float HealthAddon = config["Deathmatch"]["HealthAddon"];
-				const float MeleeAddon = config["Deathmatch"]["MeleeAddon"];
+
+				const float MovementSpeedAddon = config["Deathmatch"]["MovementSpeedPoint"];
+				const float HealthAddon = config["Deathmatch"]["Health"];
+				const float MeleeAddon = config["Deathmatch"]["MeleePoint"];
+				const float WeightAddon = config["Deathmatch"]["Weight"];
+
 
 				const int ArkShopPointsEntryFee = config["Deathmatch"]["ArkShopPointsEntryFee"];
 
@@ -75,7 +78,7 @@ public:
 				std::string Data;
 
 				InitDefaults(EventName, false, true, KillOnLogg, StructureProtection
-					, FVector(StructureProtectionPosition[0], StructureProtectionPosition[1], StructureProtectionPosition[2]), StructureProtectionDistacne, MovementSpeedAddon, HealthAddon, MeleeAddon, ArkShopPointsEntryFee, PlayersNeededToStart);
+					, FVector(StructureProtectionPosition[0], StructureProtectionPosition[1], StructureProtectionPosition[2]), StructureProtectionDistacne, MovementSpeedAddon, HealthAddon, MeleeAddon, WeightAddon, ArkShopPointsEntryFee, PlayersNeededToStart);
 
 				const auto& Spawns = config["Deathmatch"]["Spawns"];
 				for (const auto& Spawn : Spawns)
@@ -186,7 +189,7 @@ public:
 			}
 			break;
 		case EventState::TeleportingPlayers:
-			if(!EventManager::Get().TeleportEventPlayers(true, true, true, true, false, true, GetSpawns()))
+			if(!EventManager::Get().TeleportEventPlayers(Event::GetHealth() < 0 ? false : true, Event::GetMovementSpeed() < 0 ? false : true, Event::GetMelee() < 0 ? false : true, Event::GetWeight() < 0 ? false : true, true, false, true, GetSpawns()))
 			{
 				ArkApi::GetApiUtils().SendChatMessageToAll(ServerName, *Messages[4], *GetName(), PlayersNeededToStart);
 				SetState(EventState::Finished);
@@ -209,8 +212,9 @@ public:
 			break;
 		case EventState::WaitForFight:
 			if(Notifications) EventManager::Get().SendNotificationToAllEventPlayers(FLinearColor(0, 1, 1), 1.f, 1, nullptr, *Messages[8]);
-			if (WaitForTimer(30))
+			if (WaitForTimer(20))
 			{
+				ResetTimer();
 				EventManager::Get().EnableInputs();
 				EventManager::Get().SendChatMessageToAllEventPlayers(ServerName, *Messages[6], *GetName());
 				SetState(EventState::Fighting);
@@ -220,7 +224,7 @@ public:
 			{
 				const int Players = EventManager::Get().GetEventPlayersCount();
 				if (Notifications) EventManager::Get().SendNotificationToAllEventPlayers(FLinearColor(0, 1, 0), 1.5f, 1.f, nullptr, *Messages[9], *GetName(), Players);
-				//if (Players <= 1) SetState(EventState::Rewarding);
+				if (Players <= 1 && WaitForTimer(30)) SetState(EventState::Rewarding);
 			}
 			break;
 		case EventState::Rewarding:

@@ -11,8 +11,8 @@ namespace EventManager
 {
 	struct EventPlayerStats_s
 	{
-		float health, melee, speed;
-		EventPlayerStats_s() : health(-1.f), melee(-1.f), speed(-1.f) {}
+		float health, melee, speed, weight;
+		EventPlayerStats_s() : health(-1.f), melee(-1.f), speed(-1.f), weight(-1.f) {}
 	};
 
 	struct EventPlayer
@@ -112,7 +112,7 @@ namespace EventManager
 
 		virtual	bool IsEventProtectedStructure(const FVector& StructurePos) = 0;
 		
-		virtual bool TeleportEventPlayers(const bool ApplyFairHp, const bool ApplyFairMovementSpeed, const bool ApplyFairMeleeDamage, const bool DisableInputs, const bool WipeInventoryOrCheckIsNaked, const bool PreventDinos, SpawnsMap& Spawns) = 0;
+		virtual bool TeleportEventPlayers(const bool ApplyFairHp, const bool ApplyFairMovementSpeed, const bool ApplyFairMeleeDamage, const bool ApplyFairWeight, const bool DisableInputs, const bool WipeInventoryOrCheckIsNaked, const bool PreventDinos, SpawnsMap& Spawns) = 0;
 		virtual void TeleportHome(const EventPlayer& player, const bool WipeInventory, const bool PlayerDied) = 0;
 		virtual void TeleportWinningEventPlayersToStart(const bool WipeInventory) = 0;
 		virtual void EnableInputs() = 0;

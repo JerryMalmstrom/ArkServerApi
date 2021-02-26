@@ -55,6 +55,11 @@ namespace EventManager
 		return Events.Num();
 	}
 
+	void updatePlayerStats(UPrimalCharacterStatusComponent* char_component, int id, float is, float max) {
+		char_component->CurrentStatusValuesField()()[id] = is;
+		char_component->MaxStatusValuesField()()[id] = max;
+	}
+
 	bool EventManager::StartEvent(const int EventID)
 	{
 		if (CurrentEvent) return false;
@@ -165,7 +170,7 @@ namespace EventManager
 		}
 	}
 
-	bool EventManager::TeleportEventPlayers(const bool ApplyFairHp, const bool ApplyFairMovementSpeed, const bool ApplyFairMeleeDamage, const bool DisableInputs, const bool WipeInventoryOrCheckIsNaked, const bool PreventDinos, SpawnsMap& Spawns)
+	bool EventManager::TeleportEventPlayers(const bool ApplyFairHp, const bool ApplyFairMovementSpeed, const bool ApplyFairMeleeDamage, const bool ApplyFairWeight, const bool DisableInputs, const bool WipeInventoryOrCheckIsNaked, const bool PreventDinos, SpawnsMap& Spawns)
 	{
 		int TeamCount = (int)Spawns.size(), TeamIndex = 0;
 		if (TeamCount < 1) return false;
@@ -188,6 +193,9 @@ namespace EventManager
 		const float MovementSpeed = CurrentEvent->GetMovementSpeed();
 		const float Health = CurrentEvent->GetHealth();
 		const float Melee = CurrentEvent->GetMelee();
+		const float Weight = CurrentEvent->GetWeight();
+
+		if (LogToConsole) Log::GetLog()->info("Fair: {} {} ({})!", Health, MovementSpeed, Melee);
 
 		FVector Pos;
 		bool RemovePlayers = false;
@@ -246,9 +254,9 @@ namespace EventManager
 				{
 					if (ApplyFairHp)
 					{
-						float* health = charStatus->CurrentStatusValuesField()();
-						player.EventPlayerStats.health = *health;
-						*health = Health;
+						float health = charStatus->CurrentStatusValuesField()()[0];
+						player.EventPlayerStats.health = health;
+						updatePlayerStats(charStatus, 0, Health, Health);
 					}
 
 					float* torpor = charStatus->CurrentStatusValuesField()() + 2;
@@ -256,19 +264,24 @@ namespace EventManager
 
 					if (ApplyFairMovementSpeed)
 					{
-						float* speed = charStatus->CurrentStatusValuesField()() + 9;
-						player.EventPlayerStats.speed = *speed;
-						*speed = MovementSpeed;
+						float speed = charStatus->CurrentStatusValuesField()()[9];
+						player.EventPlayerStats.speed = speed;
+						updatePlayerStats(charStatus, 9, MovementSpeed, MovementSpeed);
 					}
 
 					if (ApplyFairMeleeDamage)
 					{
-						float* melee = charStatus->CurrentStatusValuesField()() + 8;
-						player.EventPlayerStats.melee = *melee;
-						*melee = Melee;
+						float melee = charStatus->CurrentStatusValuesField()()[8];
+						player.EventPlayerStats.melee = melee;
+						updatePlayerStats(charStatus, 8, Melee, Melee);
 					}
 
-					if (LogToConsole) Log::GetLog()->info("Fair: {} {} ({})!", ApplyFairMeleeDamage, ApplyFairMovementSpeed, ApplyFairHp);
+					if (ApplyFairWeight)
+					{
+						float weight = charStatus->CurrentStatusValuesField()()[7];
+						player.EventPlayerStats.weight = weight;
+						updatePlayerStats(charStatus, 7, 0, Weight);
+					}
 				}
 
 			}
@@ -583,22 +596,25 @@ namespace EventManager
 		{
 			UPrimalCharacterStatusComponent* charStatus = player.ASPC->GetPlayerCharacter()->GetCharacterStatusComponent();
 
-			float* health = charStatus->CurrentStatusValuesField()();
-			*health = player.EventPlayerStats.health == -1.f ? 99.f : (player.EventPlayerStats.health < 99.f ? 99.f : (player.EventPlayerStats.health-1)); //for some reason to fix broken legs after event when your health was 100 you had to -1 health maybe find a function later to resync stuff related to injuries for now -1 health works.
+			//float* health = charStatus->CurrentStatusValuesField()();
+			//*health = player.EventPlayerStats.health == -1.f ? 99.f : (player.EventPlayerStats.health < 99.f ? 99.f : (player.EventPlayerStats.health-1)); //for some reason to fix broken legs after event when your health was 100 you had to -1 health maybe find a function later to resync stuff related to injuries for now -1 health works.
 
 			float* torpor = charStatus->CurrentStatusValuesField()() + 2;
 			*torpor = 1;
 
+			if (player.EventPlayerStats.health != -1.f)
+			{
+				updatePlayerStats(charStatus, 0, player.EventPlayerStats.health, player.EventPlayerStats.health);
+			}
+
 			if (player.EventPlayerStats.melee != -1.f)
 			{
-				float* melee = charStatus->CurrentStatusValuesField()() + 8;
-				*melee = player.EventPlayerStats.melee;
+				updatePlayerStats(charStatus, 8, player.EventPlayerStats.melee, player.EventPlayerStats.melee);
 			}
 
 			if (player.EventPlayerStats.speed != -1.f)
 			{
-				float* speed = charStatus->CurrentStatusValuesField()() + 9;
-				*speed = player.EventPlayerStats.speed;
+				updatePlayerStats(charStatus, 9, player.EventPlayerStats.speed, player.EventPlayerStats.speed);
 			}
 
 			player.ASPC->GetPlayerCharacter()->bIsSleeping() = false;

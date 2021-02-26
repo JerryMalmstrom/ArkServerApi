@@ -23,12 +23,12 @@ private:
 	SpawnsMap Spawns;
 	FVector StructureProtectionPosition;
 	int StructureProtectionDistance, Counter, Timer, ArkShopPointsEntryFee, PlayersNeededToStart;
-	float MovementSpeed, Health, Melee;
+	float MovementSpeed, Health, Melee, Weight;
 	bool StructureProtection, ConfigLoaded, KillOnLogg, OverrideJoinAndLeave, FinalWarning, OnlyAllowNakedsOnJoinEventCommand;
 
 public:
 	void InitDefaults(const FString& Name, const bool OverrideJoinAndLeave = false, const bool OnlyAllowNakedsOnJoinEventCommand = true, const bool KillOnLogg = true, const bool StructureProtection = false
-		, const FVector StructureProtectionPosition = FVector(0, 0, 0), const int StructureProtectionDistance = 0, const float MovementSpeed = 0.f, const float Health = 0.f, const float Melee = 0.f, const int ArkShopPointsEntryFee = 0, const int PlayersNeededToStart = 2)
+		, const FVector StructureProtectionPosition = FVector(0, 0, 0), const int StructureProtectionDistance = 0, const float MovementSpeed = 0.f, const float Health = 100.f, const float Melee = 0.f, const float Weight = 100.f, const int ArkShopPointsEntryFee = 0, const int PlayersNeededToStart = 2)
 	{
 		this->Name = Name;
 		this->KillOnLogg = KillOnLogg;
@@ -40,6 +40,7 @@ public:
 		this->MovementSpeed = MovementSpeed;
 		this->Health = Health;
 		this->Melee = Melee;
+		this->Weight = Weight;
 
 		this->ArkShopPointsEntryFee = ArkShopPointsEntryFee;
 		this->PlayersNeededToStart = PlayersNeededToStart;
@@ -104,8 +105,10 @@ public:
 	void ResetConfigLoaded() { ConfigLoaded = false; }
 
 	float GetMovementSpeed() { return MovementSpeed; }
-	float GetHealth() { return MovementSpeed; }
-	float GetMelee() { return MovementSpeed; }
+	float GetHealth() { return Health; }
+	float GetMelee() { return Melee; }
+	float GetWeight() { return Weight; }
+
 
 	int GetArkShopEntryFee() { return ArkShopPointsEntryFee; }
 	int GetPlayersNeededToStart() { return PlayersNeededToStart; }
